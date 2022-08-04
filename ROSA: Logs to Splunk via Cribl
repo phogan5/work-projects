@@ -1,0 +1,54 @@
+This page will serve as discovery and documentation outlining the process of using ‘Splunk Connect for Kubernetes’ to move logs from ROSA. This service is intentioned for moving logs directly to Splunk, but by changing the configuration, we believe the service will work just as well moving logs to Cribl instead, where they can then be moved by the Monitoring team. 
+
+What it is
+Splunk Connect for Kubernetes (SCK) provides a way to import and search Kubernetes data to a Splunk deployment. SCK works with AWS EKS and openshift (ROSA), making it perfect for providing a uniform, standard method of collecting logs. 
+
+How it works
+SCK works using Helm: a sort of package manager for the Kubernetes environment (think apt, yum, homebrew). This makes it easy to search and install prebuilt repos (charts) onto the Kubernetes environment. 
+
+Technically, the SCK chart is an umbrella chart comprised of three features of SCK: log collection, metric collection, and object collection. These features can be enabled and disabled independent of one another, and at any time. For the purposes of this feature, we will be enabling only the log collection chart, though the other two may be enabled at any time as needed. 
+
+ 
+
+Once SCK is installed, its functionality is dependent on the attached yaml file. This specifies all of the necessary configuration options, including, but not limited to:
+
+HEC token
+
+Certificates
+
+ports
+
+protocols
+
+log destination (Splunk, Cribl)
+
+Additionally, there are options for each feature (logs, metrics, objects). The logs chart contains some of the following configuration options that will need to be set up for the desired logging functionality:
+
+location of log files
+
+configuration for container logs
+
+affected pods
+
+Splunk configurations
+
+certificates
+
+Our usage
+During the initial discovery phase of our work, we decided to access ROSA and install SCK using Rundeck. By accessing the service via the Rundeck server and creating commands for easy manipulation of the Helm chart, we can easily configure SCK on the fly as needed. 
+
+Once SCK is installed on ROSA and the chart is configured. The logs should automatically begin moving from ROSA to Cribl (or wherever we point the yaml file to).
+
+The installation seems to be a simple process, consisting mainly of installing the repo, then passing the configuration file. The bulk of the work will likely be in configuring the chart according to our environment.
+
+Documentation
+The Github page for SCK provides solid documentation on the architecture and installation of SCK, as well as giving an overview of how it works. There are also numerous example files that can be used as reference when configuring the chart for our environment. 
+
+In the Github documentation, the main chart is called ‘values.yml’ and is located at:
+splunk-connect-for-kubernetes/helm-chart/splunk-connect-for-kubernetes/
+
+For charts with individual items:
+splunk-connect-for-kubernetes/helm-chart/splunk-connect-for-kubernetes/charts
+
+There is also an example chart with some pre-filled values specifically for OpenShift. This may be useful in getting an idea of what to fill in where, though this is only for logging:
+splunk-connect-for-kubernetes/helm-chart/splunk-connect-for-kubernetes/examples/openshift4-logging-only.yaml
