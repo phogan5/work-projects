@@ -1,0 +1,60 @@
+While Security Hub is a great tool for presenting findings spanning multiple AWS accounts, there are some areas it falls short. One of those areas is in exporting findings to a readable, sortable, and countable format. 
+
+While the 'Insights' feature allows you to make a custom filter to view certain accounts, certain findings, certain severities etc. There is currently no easy to way to export those findings, meaning there is no quick process to get a count of all findings of each type. 
+
+In order to get around this, our team used the AWS CLI ‘get-findings’ command to manually set filters and receive detailed information for each finding in JSON format. Those JSON files were then converted to CSVs and imported into Excel. This allowed for more the in-depth data analysis we needed to evaluate the effort needed for remediation. 
+
+ 
+
+Insights
+Security hub insights is a built in feature to AWS and it allows for creation of custom filters and views, allowing for easy viewing of only relevant findings. 
+
+
+By creating filters for specific account ID’s we were able to narrow down the results to only certain accounts. There are a host of other filters available, including but not limited to:
+
+Severity label: Specifies critical, high, medium, low, or information findings
+
+Resource type: Specifies what kinds are resources are being included in the search
+
+Compliance status: Specifies resources that are compliant or non-compliant with security standards
+
+Resource ID: Specifies the ARN of a specific resource
+
+IAM User: Specifies findings generated from an IAM user
+
+Additionally, there is the option to group results by a certain attribute. In the following picture, they are grouped by Account ID, though they can be grouped by other filters as well. This allows for an easier breakdown of findings.
+
+On clicking a grouping, all findings associated with that grouping are listed one after another, with loads of information detailing what the finding is, where it is found, and how to fix it. 
+
+ 
+
+Exporting Findings
+While the insight view is valuable in getting an overview of the security environment, it is difficult to drill down and getting details on multiple findings. For this you can use the get-findings CLI command to download findings en masse and apply them to an Excel spreadsheet, where they can then be sorted and analyzed. 
+
+‘get-findings’ is an AWS CLI command that takes various filters as input, and outputs the findings to JSON format. Essentially mimicking the Insights feature but with a few key differences, the biggest of which is an inability to specify more than one value for each filter. This means that the AccountID filter can only accept one account, making multi-account results difficult to obtain. 
+
+Syntax
+Example command:
+
+ 
+aws securityhub get-findings --filters 
+'{"AwsAccountId":[{"Comparison":"EQUALS","Value":"380$$$$$$$$"}],
+"ResourceType":[{"Comparison":"PREFIX","Value": "AwsEc2"}],
+"RecordState":[{"Comparison":"EQUALS","Value": "ACTIVE"}],
+"SeverityLabel":[{"Comparison":"NOT_EQUALS","Value": "LOW"}],
+"ComplianceStatus":[{"Comparison":"EQUALS","Value": "FAILED"}]}'
+ 
+
+‘get-findings’ is followed by '--filters' to specify what filters should be run against the data. Each filter needs a key (AwsAccountId, ResourceType, SeverityLabel), a comparison operator (EQUALS, PREFIX, NOT_EQUALS), and a value (AwsEc2, ACTIVE, FAILED). The filters are essentially a CMD-ized version of the Insights filters mentioned above. The JSON output can then be piped or appended to a file using > or >>.
+
+The caveat is because the filters are presented as key-value pairs, each key may only have one value. If you need to run this command against multiple accounts, or multiple resources, the commands must be run separately.
+
+Converting to Excel
+With the JSON files in hand, they must first be converted to CSVs. Excel can import JSONs natively, though for this use case that feature was not working as intended. Instead, we used this website to convert to CSV first. The CSVs were then able to be easily imported to Excel while maintaining proper formatting.
+
+Once the findings are in Excel, they come with A LOT of potentially extraneous columns listing various details about each finding. Hiding or deletion of the columns is recommended according to the information you need. 
+
+If multiple queries were run, and you now have multiple CSVs, Excel can easily append one onto another, resulting in a single spreadsheet with all of the consolidated information.
+
+Final Product
+At the end, you should have a single excel spreadsheet with a row for each finding, and columns for each finding attribute. These findings can then be counted, sorted, filtered, or used to create visuals as with any Excel spreadsheet:
