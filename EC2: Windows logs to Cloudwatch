@@ -1,8 +1,12 @@
+This project entails installing CW agents on Windows-based EC2 instances. The agent then streams logs from EC2 to Clodudwatch, where logs from 
+multiple machines can be centrally monitored, or moved to a different log analysis engine (Splunk, Cribl, etc.)
+
+
 0.1: Two Windows EC2 instances are needed in order to adhere to security best practices and the principle of least privilege: 
 
 1 machine that will be the ‘server’: the Windows machine generating logs to CloudWatch
 
-1 machine that will be the ‘admin’: the Windows machine responsible for installing the CloudWatch agents
+1 machine that will be the ‘admin’: the Windows machine responsible for installing the CloudWatch agents on the server machine.
 
 This way, the server machine can be configured to stream logs to CloudWatch without ever being directly interacted with. 
 
@@ -19,6 +23,7 @@ Policies:
 CloudWatchAgentServerPolicy
 
 AmazonEC2RoleforSSM [Soon to be deprecated, consider investigating alternative solution]
+
 
 Admin instance role:
 
@@ -48,19 +53,19 @@ Run file - C:\Program Files\Amazon\AmazonCloudWatchAgent\amazon-cloudwatch-agent
 
 This will launch an installation wizard guiding you through installation and configuration of the log streaming. Configuration options include, but are not limited to:
 
-Log expiration policy
+- Log expiration policy
 
-Custom application metric collection using StatsD or collectd
+- Custom application metric collection using StatsD or collectd
 
-Specify usage metrics collected (if any) using predefined CloudWatch config file or default AWS detail profiles
+- Specify usage metrics collected (if any) using predefined CloudWatch config file or default AWS detail profiles
 
-Specify Windows event logs to collect by log name, verbosity level, and urgency level (informational, warning, critical, etc.)
+- Specify Windows event logs to collect by log name, verbosity level, and urgency level (informational, warning, critical, etc.)
 
-[Important] Log group name: the log group that will appear in the Cloudwatch console, name it something recognizable
+- [Important] Log group name: the log group that will appear in the Cloudwatch console, name it something recognizable
 
-Data format (XML, plaintext)
+- Data format (XML, plaintext)
 
-Parameter store name (remember this for later)
+- Parameter store name (remember this for later)
 
 These parameters will automatically fill out and apply a CloudWatch config file that is viewable after finishing the wizard, if you want to make manual changes to the config or make one yourself that is also an option.
 
